@@ -1,0 +1,87 @@
+name: Build Go Multi-Platform
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    name: Build (${{ matrix.goos }}/${{ matrix.goarch }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux
+          - goos: linux
+            goarch: amd64
+            output_name: gohealthcheck-linux-amd64
+          - goos: linux
+            goarch: arm64
+            output_name: gohealthcheck-linux-arm64
+          - goos: linux
+            goarch: arm
+            output_name: gohealthcheck-linux-arm
+          # Windows
+          - goos: windows
+            goarch: amd64
+            output_name: gohealthcheck-windows-amd64.exe
+          - goos: windows
+            goarch: arm64
+            output_name: gohealthcheck-windows-arm64.exe
+          # macOS (Darwin)
+          - goos: darwin
+            goarch: amd64
+            output_name: gohealthcheck-darwin-amd64
+          - goos: darwin
+            goarch: arm64
+            output_name: gohealthcheck-darwin-arm64
+
+    steps:
+      - name: Checkout código fonte
+        uses: actions/checkout@v4
+
+      - name: Configurar ambiente Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22' # Ajuste para a versão do seu projeto
+          check-latest: true
+          cache: true
+
+      - name: Compilar binário
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0 # Garante compilação estática sem dependência de C
+        run: |
+          mkdir -p dist
+          go build -v -ldflags="-s -w" -o dist/${{ matrix.output_name }} ./cmd/main.go
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: dist/${{ matrix.output_name }}
+          retention-days: 7
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+          merge-multiple: true
+
+      - name: Release no GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
+          draft: true
