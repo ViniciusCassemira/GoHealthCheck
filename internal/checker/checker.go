@@ -5,7 +5,8 @@ import (
 	"net/http"
 )
 
-func CheckMultipleUrl(urls []string, options output.CheckOptions) error {
+func CheckMultipleUrl(urls []string, options output.CheckOptions, jsonPath string) error {
+	checkResultList := output.CheckResultList{}
 
 	for _, url := range urls {
 		checkResult, err := CheckUrl(url, options)
@@ -13,8 +14,13 @@ func CheckMultipleUrl(urls []string, options output.CheckOptions) error {
 			return err
 		}
 
+		checkResultList.Results = append(checkResultList.Results, checkResult)
+		checkResultList.TotalUrls++
+
 		output.PrintResultInTerminal(checkResult)
 	}
+
+	output.SaveResultInJsonFile(checkResultList, jsonPath)
 
 	return nil
 }
