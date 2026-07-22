@@ -33,10 +33,15 @@ go run ./cmd --url-file exemplo.txt --json-path ./resultados
 ### Executando a partir do binário
 > Para agilizar o seu uso, acesse a área das releases e baixe o binário compatível com a sua máquina
 
-
+Dê permissão de execução ao binário baixado (exemplo em linux)
 ```bash
-go build -o healthcheck ./cmd
-./healthcheck --url-file exemplo.txt --json-path ./resultados
+chmod +x gohealthcheck-linux-amd64 
+```
+
+Agora, execute o binário passando as flags necessárias
+```bash
+./gohealthcheck-linux-amd64  --url-file /home/vinicius/Downloads/file.txt --json-path /home/vinicius/Downloads/output
+
 ```
 
 
