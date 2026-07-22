@@ -16,5 +16,14 @@ func LoadUrls(path string) ([]string, error) {
 	// Create Slice with file content
 	urls := strings.Split(string(data), "\n")
 
-	return urls, nil
+	// Remove empty strings
+	urls_filtered := []string{}
+	for _, url := range urls {
+		url = strings.TrimSpace(url)
+		if url != "" {
+			urls_filtered = append(urls_filtered, url)
+		}
+	}
+
+	return urls_filtered, nil
 }
