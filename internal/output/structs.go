@@ -12,8 +12,8 @@ type CheckResultList struct {
 }
 
 type CheckOptions struct {
-	CheckStatusCode      bool
-	CheckProtocolversion bool
+	CheckStatusCode      bool `json:"status_code"`
+	CheckProtocolversion bool `json:"protocol_version"`
 }
 
 type FlagConfig struct {

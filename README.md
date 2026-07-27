@@ -38,9 +38,18 @@ Dê permissão de execução ao binário baixado (exemplo em linux)
 chmod +x gohealthcheck-linux-amd64 
 ```
 
+O binário do programa espera um arquivo `.json` com as opções de consultas que serão feitas em cada uma das URLs. Certifique-se de ter esse arquivo em sua máquina, olhe o modelo desse arquivo na raiz do projeto: `config.example.json`
+
+```json
+{
+    "protocol_version": true,
+    "status_code": true
+}
+```
+
 Agora, execute o binário passando as flags necessárias
 ```bash
-./gohealthcheck-linux-amd64  --url-file /home/vinicius/Downloads/file.txt --json-path /home/vinicius/Downloads/output
+./gohealthcheck-linux-amd64  --url-file /home/vinicius/Downloads/file.txt --json-path /home/vinicius/Downloads/output --json-config-file config.example.json
 
 ```
 

@@ -3,6 +3,8 @@ package loader
 import (
 	"os"
 	"strings"
+	"encoding/json"
+	"GoHealthCheck/internal/output"
 )
 
 func LoadUrls(path string) ([]string, error) {
@@ -26,4 +28,29 @@ func LoadUrls(path string) ([]string, error) {
 	}
 
 	return urls_filtered, nil
+}
+
+func ConvertJsonConfigFileToStruct(pathFile string) (output.CheckOptions, error) {
+	data, err := LoadJsonConfigFile(pathFile)
+	if err != nil {
+		return output.CheckOptions{}, err
+	}
+
+	var checkOptions output.CheckOptions
+
+	err = json.Unmarshal(data, &checkOptions)
+	if err != nil {
+		return output.CheckOptions{}, err
+	}
+
+	return checkOptions, nil
+}
+
+func LoadJsonConfigFile(path string) ([]byte, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return data, nil
 }
