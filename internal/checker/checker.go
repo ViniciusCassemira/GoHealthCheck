@@ -1,71 +1,78 @@
 package checker
 
 import (
+	"GoHealthCheck/internal/logger"
 	"GoHealthCheck/internal/output"
 	"net/http"
+	"time"
+	"sync"
 )
 
-func CheckMultipleUrl(urls []string, options output.CheckOptions, jsonPath string) error {
-	checkResultList := output.CheckResultList{}
+func CheckMultipleUrl(urls []string, options output.CheckOptions, pathJsonResultFile string) {
+	var wg sync.WaitGroup
+	ch := make(chan output.UrlCheckResult, len(urls))
+	
+	checkResultList := output.UrlCheckResultList{}
+	execution_time := time.Now()
 
 	for _, url := range urls {
-		checkResult, err := CheckUrl(url, options)
-		if err != nil {
-			return err
-		}
+		wg.Add(1)
+		go func(){
+			url := url
+			ch <- CheckUrl(url, options, &wg)
+		}()
+	}
+	wg.Wait()
 
+	for i:= 0; i < len(urls); i++ {
+		logger.WriteLog("Checking URL: " + urls[i])
+		checkResult := <-ch
 		checkResultList.Results = append(checkResultList.Results, checkResult)
 		checkResultList.TotalUrls++
-
-		output.PrintResultInTerminal(checkResult)
+		//output.PrintResultInTerminal(checkResult)
 	}
 
-	output.SaveResultInJsonFile(checkResultList, jsonPath)
-
-	return nil
+	checkResultList.ExecutionTimeInSeconds = time.Since(execution_time).Seconds()
+	output.SaveResultInJsonFile(checkResultList, pathJsonResultFile)
 }
 
-func CheckUrl(url string, options output.CheckOptions) (output.CheckResult, error) {
-	result := output.CheckResult{}
+func CheckUrl(url string, options output.CheckOptions, wg *sync.WaitGroup) (output.UrlCheckResult) {
+	defer wg.Done()
+	result := output.UrlCheckResult{}
 	result.URL = url
+	execution_time := time.Now()
 
 	if options.CheckStatusCode {
-		statusCode, err := checkStatusCode(url)
-		if err != nil {
-			return result, err
-		}
-
-		result.StatusCode = statusCode
+		result.StatusCode = checkStatusCode(url)
 	}
 
 	if options.CheckProtocolversion {
-		protocolVersion, err := checkProtocolVersion(url)
-		if err != nil {
-			return result, err
-		}
-
-		result.ProtocolVersion = protocolVersion
+		result.ProtocolVersion = checkProtocolVersion(url)
 	}
 
-	return result, nil
+	result.ExecutionTimeInSeconds = time.Since(execution_time).Seconds()
+
+	return result
 }
 
-func checkStatusCode(url string) (int, error) {
+func checkStatusCode(url string) (int) {
 	res, err := http.Get(url)
 	if err != nil {
-		return 0, err
+		logger.WriteLog(err.Error())
+		return 0
 	}
 	defer res.Body.Close()
 
-	return res.StatusCode, nil
+	return res.StatusCode
 }
 
-func checkProtocolVersion(url string) (string, error) {
+func checkProtocolVersion(url string) (string) {
 	res, err := http.Get(url)
 	if err != nil {
-		return "", err
+		logger.WriteLog(err.Error())
+		return ""
 	}
 	defer res.Body.Close()
 
-	return res.Proto, nil
+	return res.Proto
 }

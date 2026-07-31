@@ -7,14 +7,14 @@ import (
 	"time"
 )
 
-func PrintResultInTerminal(result CheckResult) {
+func PrintResultInTerminal(result UrlCheckResult) {
 	fmt.Printf("URL: %v\n", result.URL)
 	fmt.Printf("StatusCode: %v\n", result.StatusCode)
 	fmt.Printf("Protocol Version: %v\n", result.ProtocolVersion)
 	fmt.Println("===============================================")
 }
 
-func SaveResultInJsonFile(result CheckResultList, jsonPath string) error {
+func SaveResultInJsonFile(result UrlCheckResultList, jsonPath string) error {
 
 	data, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {

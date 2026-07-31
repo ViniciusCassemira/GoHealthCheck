@@ -4,6 +4,7 @@ Programa simples em Go que verifica URLs e retorna:
 
 - [x] Código de status HTTP (`status_code`)
 - [x] Versão do protocolo HTTP (`protocol_version`)
+- [x] Tempo de execução da pesquisa em segundos (`execution_time_in_seconds`)
 
 ## Como usar
 
@@ -22,12 +23,18 @@ https://github.com
 |------|-----------|
 | `--url-file` | Caminho para o arquivo com as URLs (obrigatório) |
 | `--json-path` | Diretório onde o JSON será salvo (obrigatório) |
+| `--json-config-file` | Caminho para o arquivo JSON de configuração das consultas (obrigatório) |
 
+> **Nota:** o diretório informado em `--json-path` precisa existir antes da execução, pois o programa não o cria automaticamente
+
+### Log
+
+Durante a execução, o programa cria (ou abre, se já existir) o arquivo `gohealthcheck.log` no diretório atual e registra nele todas as operações e erros encontrados.
 
 ### Executando via Go
 
 ```bash
-go run ./cmd --url-file exemplo.txt --json-path ./resultados
+go run ./cmd --url-file exemplo.txt --json-path ./resultados --json-config-file config.example.json
 ```
 
 ### Executando a partir do binário
@@ -49,31 +56,34 @@ O binário do programa espera um arquivo `.json` com as opções de consultas qu
 
 Agora, execute o binário passando as flags necessárias
 ```bash
-./gohealthcheck-linux-amd64  --url-file /home/vinicius/Downloads/file.txt --json-path /home/vinicius/Downloads/output --json-config-file config.example.json
-
+./gohealthcheck-linux-amd64 --url-file /home/vinicius/Downloads/file.txt --json-path /home/vinicius/Downloads/output --json-config-file config.example.json
 ```
 
 
 ## Exemplo de saída
 
-O programa gera um arquivo JSON no diretório informado trazendo o resultado das consultas:
+O programa imprime o JSON no terminal e também o salva em um arquivo no diretório informado. O arquivo é nomeado com o timestamp da execução no formato `2006-01-02_15-04-05.json`:
 
 ```json
 {
   "total_results": 3,
+  "execution_time_in_seconds": 1.234,
   "results": [
     {
       "url": "https://youtube.com",
+      "execution_time_in_seconds": 0.456,
       "status_code": 200,
       "protocol_version": "HTTP/2.0"
     },
     {
       "url": "https://google.com",
+      "execution_time_in_seconds": 0.312,
       "status_code": 200,
       "protocol_version": "HTTP/2.0"
     },
     {
       "url": "https://github.com",
+      "execution_time_in_seconds": 0.289,
       "status_code": 200,
       "protocol_version": "HTTP/2.0"
     }

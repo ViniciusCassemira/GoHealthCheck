@@ -3,6 +3,7 @@ package main
 import (
 	"GoHealthCheck/internal/checker"
 	"GoHealthCheck/internal/loader"
+	"GoHealthCheck/internal/logger"
 	"GoHealthCheck/internal/output"
 	"flag"
 	"log"
@@ -15,12 +16,22 @@ func main() {
 	url_file := flag.String("url-file", "", "path to the file containing URLs to check")
 	flag.Parse()
 
-	if *json_config_file == "" { log.Fatal("JSON config file path is required, using --json-config-file flag") }
-	if *json_path == "" { log.Fatal("JSON path is required, using --json-path flag") }
-	if *url_file == "" { log.Fatal("URL file path is required, using --url-file flag") }
+	if *json_config_file == "" {
+		logger.WriteLog("JSON config file path is required, using --json-config-file flag")
+		log.Fatal("JSON config file path is required, using --json-config-file flag") 
+	}
+	if *json_path == "" { 
+		logger.WriteLog("JSON path is required, using --json-path flag")
+		log.Fatal("JSON path is required, using --json-path flag") 
+	}
+	if *url_file == "" { 
+		logger.WriteLog("URL file path is required, using --url-file flag")
+		log.Fatal("URL file path is required, using --url-file flag") 
+	}
 
 	checkOptions, err := loader.ConvertJsonConfigFileToStruct(*json_config_file)
 	if err != nil {
+		logger.WriteLog(err.Error())
 		log.Fatal(err)
 	}
 
@@ -31,11 +42,9 @@ func main() {
 
 	urls, err := loader.LoadUrls(cfg.UrlFilePath)
 	if err != nil {
+		logger.WriteLog(err.Error())
 		log.Fatal(err)
 	}
 
-	err = checker.CheckMultipleUrl(urls, checkOptions, cfg.JsonPath)
-	if err != nil {
-		log.Fatal(err)
-	}
+	checker.CheckMultipleUrl(urls, checkOptions, cfg.JsonPath)
 }
