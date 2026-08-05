@@ -40,7 +40,7 @@ func main() {
 		JsonPath: *json_path,
 	}
 
-	urls, err := loader.LoadUrls(cfg.UrlFilePath)
+	urls, err := loader.ValidateAndLoadUrls(cfg.UrlFilePath)
 	if err != nil {
 		logger.WriteLog(err.Error())
 		log.Fatal(err)
