@@ -1,18 +1,11 @@
 package output
 
 import (
-	"fmt"
 	"encoding/json"
 	"os"
 	"time"
+	"fmt"
 )
-
-func PrintResultInTerminal(result UrlCheckResult) {
-	fmt.Printf("URL: %v\n", result.URL)
-	fmt.Printf("StatusCode: %v\n", result.StatusCode)
-	fmt.Printf("Protocol Version: %v\n", result.ProtocolVersion)
-	fmt.Println("===============================================")
-}
 
 func SaveResultInJsonFile(result UrlCheckResultList, jsonPath string) error {
 
@@ -20,8 +13,6 @@ func SaveResultInJsonFile(result UrlCheckResultList, jsonPath string) error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(string(data))
 
 	time := time.Now().Format("2006-01-02_15-04-05")
 
@@ -31,4 +22,13 @@ func SaveResultInJsonFile(result UrlCheckResultList, jsonPath string) error {
 	}
 
 	return nil
+}
+
+func PrintProgressBarInTerminal(current, total int) {
+	percentage := float64(current) / float64(total) * 100
+	fmt.Printf("\rProgress: %d/%d (%.2f%%)", current, total, percentage)
+}
+
+func PrintMessageInTerminal(message string) {
+	fmt.Println(message)
 }

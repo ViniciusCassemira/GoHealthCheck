@@ -1,4 +1,4 @@
 {
-    "protocol_version": true,
-    "status_code": true
+    "http_info": true,
+    "dns_info": true
 }

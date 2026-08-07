@@ -1,9 +1,9 @@
 # Go Health Check
 
 Programa simples escrito em Go que verifica URLs dos protocolos HTTP e HTTPS, retornando informações sobre a requisição, como:
-- [x] Código de status HTTP (`status_code`)
-- [x] Versão do protocolo HTTP (`protocol_version`)
-- [x] Tempo de execução da requisição em segundos (`execution_time_in_seconds`)
+- [x] Informações HTTP (`http_info`): código de status (`status_code`) e versão do protocolo (`protocol_version`)
+- [x] Informações DNS (`dns_info`): registros A, AAAA, CNAME, MX, NS e TXT
+- [x] Tempo de execução da requisição em segundos (`execution_time`)
 
 ## Como usar
 
@@ -35,8 +35,8 @@ ftp://example.com
 O programa espera um arquivo `.json` com as opções de consultas que serão feitas em cada uma das URLs. Certifique-se de ter esse arquivo em sua máquina, olhe o modelo desse arquivo na raiz do projeto: `config.example.json`
 ```json
 {
-    "protocol_version": true,
-    "status_code": true
+    "http_info": true,
+    "dns_info": true
 }
 ```
 
@@ -76,30 +76,47 @@ Durante a execução, o programa cria (ou abre, se já existir) o arquivo `gohea
 
 ## Exemplo de saída
 
-O programa imprime o JSON no terminal e também o salva em um arquivo no diretório informado. O arquivo é nomeado com o timestamp da execução no formato `2006-01-02_15-04-05.json`:
+Durante a execução, o programa exibe no terminal uma barra de progresso com o andamento das verificações e salva o resultado em um arquivo JSON no diretório informado. O arquivo é nomeado com o timestamp da execução no formato `2006-01-02_15-04-05.json`:
+
 ```json
 {
-  "total_results": 3,
-  "execution_time_in_seconds": 1.234,
+  "total_results": 1,
+  "execution_time": 0.456,
+  "search_options": {
+    "http_info": true,
+    "dns_info": true
+  },
   "results": [
     {
       "url": "https://youtube.com",
-      "execution_time_in_seconds": 0.456,
-      "status_code": 200,
-      "protocol_version": "HTTP/2.0"
-    },
-    {
-      "url": "https://google.com",
-      "execution_time_in_seconds": 0.312,
-      "status_code": 200,
-      "protocol_version": "HTTP/2.0"
-    },
-    {
-      "url": "https://github.com",
-      "execution_time_in_seconds": 0.289,
-      "status_code": 200,
-      "protocol_version": "HTTP/2.0"
+      "execution_time": 0.456,
+      "http_info": {
+        "protocol_version": "HTTP/2.0",
+        "status_code": 200
+      },
+      "dns_info": {
+        "a_records": [
+          "142.251.128.14"
+        ],
+        "aaaa_records": [
+          "2800:3f0:4001:82e::200e"
+        ],
+        "cname_records": [
+          "youtube.com."
+        ],
+        "mx_records": [
+          "smtp.google.com."
+        ],
+        "ns_records": [
+          "ns1.google.com."
+        ],
+        "txt_records": [
+          "v=spf1 include:_spf.google.com ~all"
+        ]
+      }
     }
   ]
 }
 ```
+
+> **Nota:** quando uma consulta é desabilitada no arquivo de configuração, o campo correspondente é salvo vazio (`{}` para `http_info` e campos `null`/`[]` para `dns_info`). O campo `search_options` reflete as opções usadas na execução.
