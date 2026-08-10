@@ -65,6 +65,7 @@ func checkHttpInfo(url string) (output.HttpInfo) {
 	return output.HttpInfo{
 		ProtocolVersion: res.Proto,
 		StatusCode:      res.StatusCode,
+		ContentType:     res.Header.Get("Content-Type"),
 	}
 }
 

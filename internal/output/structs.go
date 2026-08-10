@@ -36,4 +36,5 @@ type DnsInfo struct {
 type HttpInfo struct {
 	ProtocolVersion string `json:"protocol_version"`
 	StatusCode      int    `json:"status_code"`
+	ContentType     string `json:"content_type"`
 }

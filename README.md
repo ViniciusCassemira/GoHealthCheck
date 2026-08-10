@@ -1,7 +1,7 @@
 # Go Health Check
 
 Programa simples escrito em Go que verifica URLs dos protocolos HTTP e HTTPS, retornando informações sobre a requisição, como:
-- [x] Informações HTTP (`http_info`): código de status (`status_code`) e versão do protocolo (`protocol_version`)
+- [x] Informações HTTP (`http_info`): código de status (`status_code`), versão do protocolo (`protocol_version`) e header `Content-Type` da resposta (`content_type`)
 - [x] Informações DNS (`dns_info`): registros A, AAAA, CNAME, MX, NS e TXT
 - [x] Tempo de execução da requisição em segundos (`execution_time`)
 
@@ -92,7 +92,8 @@ Durante a execução, o programa exibe no terminal uma barra de progresso com o 
       "execution_time": 0.456,
       "http_info": {
         "protocol_version": "HTTP/2.0",
-        "status_code": 200
+        "status_code": 200,
+        "content_type": "text/html; charset=UTF-8"
       },
       "dns_info": {
         "a_records": [
