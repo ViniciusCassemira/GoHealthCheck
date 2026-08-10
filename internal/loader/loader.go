@@ -33,6 +33,7 @@ func ValidateAndLoadUrls(path string) ([]string, error) {
 
 	if len(urls_filtered) == 0 {
 		logger.WriteLog("No valid URL found")
+		output.PrintMessageInTerminal("No valid URL found")
 	}
 
 	return urls_filtered, nil
